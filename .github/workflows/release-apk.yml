@@ -29,17 +29,21 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Validate release signing secrets
+      - name: Detect release signing secrets
+        id: signing
         run: |
-          if [ -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ] || \
-             [ -z "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" ] || \
-             [ -z "${{ secrets.ANDROID_KEY_ALIAS }}" ] || \
-             [ -z "${{ secrets.ANDROID_KEY_PASSWORD }}" ]; then
-            echo "::error::Missing one or more required release signing secrets."
-            exit 1
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ] && \
+             [ -n "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" ] && \
+             [ -n "${{ secrets.ANDROID_KEY_ALIAS }}" ] && \
+             [ -n "${{ secrets.ANDROID_KEY_PASSWORD }}" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Release signing secrets are missing. Building unsigned APK."
           fi
 
       - name: Decode release keystore
+        if: steps.signing.outputs.enabled == 'true'
         run: |
           base64 --decode <<< "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" > "$RUNNER_TEMP/release.keystore"
           echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
@@ -54,6 +58,7 @@ jobs:
           fi
 
       - name: Build signed release APK
+        if: steps.signing.outputs.enabled == 'true'
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -65,15 +70,24 @@ jobs:
           fi
           ./gradlew $gradle_args
 
+      - name: Build unsigned release APK
+        if: steps.signing.outputs.enabled != 'true'
+        run: |
+          gradle_args="lint test assembleRelease"
+          if [ -n "${{ steps.version.outputs.value }}" ]; then
+            gradle_args="$gradle_args -PVERSION_NAME=${{ steps.version.outputs.value }}"
+          fi
+          ./gradlew $gradle_args
+
       - name: Upload release APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release-apk
-          path: app/build/outputs/apk/release/app-release.apk
+          path: app/build/outputs/apk/release/app-release*.apk
           if-no-files-found: error
 
       - name: Create GitHub release with APK
         if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
         with:
-          files: app/build/outputs/apk/release/app-release.apk
+          files: app/build/outputs/apk/release/app-release*.apk
