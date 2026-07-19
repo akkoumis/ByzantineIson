@@ -1,5 +1,5 @@
 # Byzantine Ison Android Application
-https://play.google.com/store/apps/details?id=com.coderss.ison
+https://play.google.com/store/apps/details?id=com.github.akkoumis.ison
 
 This Android application plays isokratima (ison) for chanters of Byzantine music.
 It comes with 6 main scales and allows users to edit scales.
