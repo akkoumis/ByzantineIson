@@ -9,8 +9,12 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.DialogFragment;
 
 import android.view.KeyEvent;
@@ -54,10 +58,27 @@ public class ScaleManager extends AppCompatActivity {
             setTheme(R.style.LightAppTheme);
         }
 
+        EdgeToEdge.enable(this);
+
         super.onCreate(savedInstanceState);
         scales = Scale.loadScales(this.getApplicationContext());
 
         setContentView(R.layout.scale_manager);
+
+        int horizontalMargin = (int) getResources().getDimension(R.dimen.activity_horizontal_margin);
+        int verticalMargin = (int) getResources().getDimension(R.dimen.activity_vertical_margin);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.scale_manager_root), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(
+                    systemBars.left + horizontalMargin,
+                    systemBars.top + verticalMargin,
+                    systemBars.right + horizontalMargin,
+                    systemBars.bottom + verticalMargin
+            );
+            return insets;
+        });
+
         setTitle("Scale Manager");
         setUpButtons();
     }

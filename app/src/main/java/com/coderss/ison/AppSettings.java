@@ -7,7 +7,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
@@ -32,11 +36,28 @@ public class AppSettings extends AppCompatActivity {
             setTheme(R.style.LightAppTheme);
         }
 
+        EdgeToEdge.enable(this);
+
         super.onCreate(savedInstanceState);
 
         player = new Player(this);
 
         setContentView(R.layout.app_settings);
+
+        int horizontalMargin = (int) getResources().getDimension(R.dimen.activity_horizontal_margin);
+        int verticalMargin = (int) getResources().getDimension(R.dimen.activity_vertical_margin);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.app_settings_root), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(
+                    systemBars.left + horizontalMargin,
+                    systemBars.top + verticalMargin,
+                    systemBars.right + horizontalMargin,
+                    systemBars.bottom + verticalMargin
+            );
+            return insets;
+        });
+
         setTitle("Preferences");
         getSupportFragmentManager()
                 .beginTransaction()

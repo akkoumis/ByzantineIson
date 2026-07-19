@@ -9,9 +9,13 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.preference.PreferenceManager;
 
 import android.provider.Settings;
@@ -81,6 +85,8 @@ public class IsonActivity extends AppCompatActivity {
             setTheme(R.style.LightAppTheme);
         }
 
+        EdgeToEdge.enable(this);
+
         //this is called when the view/activity is loaded
         super.onCreate(savedInstanceState);
 
@@ -122,6 +128,20 @@ public class IsonActivity extends AppCompatActivity {
         preferences.initializeSoundSet(player);
 
         setContentView(R.layout.activity_main);
+
+        int horizontalMargin = (int) getResources().getDimension(R.dimen.activity_horizontal_margin);
+        int verticalMargin = (int) getResources().getDimension(R.dimen.activity_vertical_margin);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_root), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(
+                    systemBars.left + horizontalMargin,
+                    systemBars.top + verticalMargin,
+                    systemBars.right + horizontalMargin,
+                    systemBars.bottom + verticalMargin
+            );
+            return insets;
+        });
     }
 
     @Override

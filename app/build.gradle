@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId = "com.coderss.ison"
         minSdk = 21
-        targetSdk = 28
+        targetSdk = 35
         versionCode = 10
         versionName = "3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -33,6 +33,8 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation libs.androidx.appcompat
+    implementation libs.androidx.activity
+    implementation libs.androidx.core
     implementation libs.androidx.constraintlayout
     implementation libs.androidx.preference
     testImplementation libs.junit
