@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -191,7 +192,7 @@ public class IsonActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.openIsonDock) {
 
             // check if we have permission to draw overlays before opening the dock
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&!Settings.canDrawOverlays(this)) {
+            if (!Settings.canDrawOverlays(this)) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
                 startActivity(intent);
                 return false;
@@ -436,7 +437,7 @@ public class IsonActivity extends AppCompatActivity {
 
     public void addButtonColorFilter() {
         if (note != -1) {
-            button[note].getBackground().setColorFilter(0x88333333, PorterDuff.Mode.DARKEN);
+            button[note].getBackground().setColorFilter(new PorterDuffColorFilter(0x88333333, PorterDuff.Mode.DARKEN));
         }
     }
 

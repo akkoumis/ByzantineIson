@@ -8,7 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
@@ -17,8 +20,10 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.WindowMetrics;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Space;
@@ -71,8 +76,6 @@ public class DockService extends Service {
         setScale(currentScaleIndex, totalNotes, notesBelow);
 
         wm = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics metrics = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(metrics);
         dockParams = new WindowManager.LayoutParams(
                 (int)(getResources().getDisplayMetrics().densityDpi * preferences.getDockWidth()),
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -89,12 +92,25 @@ public class DockService extends Service {
         parentDockLayout = new LinearLayout(this);
         parentDockLayout.setOrientation(LinearLayout.VERTICAL);
 
-        Space moveSpace = new Space(this);
-        moveSpace.setLayoutParams(
-                new LayoutParams(LayoutParams.MATCH_PARENT,
-                        (int)(getResources().getDisplayMetrics().densityDpi * 0.25))
-        );
-        parentDockLayout.addView(moveSpace);
+        int handleHeight = (int)(getResources().getDisplayMetrics().densityDpi * 0.25);
+        FrameLayout handleContainer = new FrameLayout(this);
+        handleContainer.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, handleHeight));
+        handleContainer.setBackgroundColor(0xFFCCCCCC); // Light gray bar
+
+        View handleIndicator = new View(this);
+        int indicatorWidth = (int)(getResources().getDisplayMetrics().densityDpi * 0.4);
+        int indicatorHeight = (int)(getResources().getDisplayMetrics().densityDpi * 0.03);
+        FrameLayout.LayoutParams indicatorParams = new FrameLayout.LayoutParams(
+                indicatorWidth, indicatorHeight, Gravity.CENTER);
+        handleIndicator.setLayoutParams(indicatorParams);
+
+        GradientDrawable shape = new GradientDrawable();
+        shape.setCornerRadius(indicatorHeight / 2.0f);
+        shape.setColor(0xFF888888); // Darker gray handle
+        handleIndicator.setBackground(shape);
+
+        handleContainer.addView(handleIndicator);
+        parentDockLayout.addView(handleContainer);
 
         ScrollView scroller = new ScrollView(this);
         LinearLayout layout = new LinearLayout(this);
@@ -114,8 +130,7 @@ public class DockService extends Service {
             public boolean onTouch(View v, MotionEvent event) {
                 //scroller.invalidate();
                 // TODO Auto-generated method stub
-                DisplayMetrics metrics = new DisplayMetrics();
-                wm.getDefaultDisplay().getMetrics(metrics);
+                int heightPixels = getScreenHeight();
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     initialWindowX = dockParams.x;
                     initialTouchX = event.getRawX();
@@ -124,13 +139,13 @@ public class DockService extends Service {
                     closeWindowOnDrop = false;
                     wm.updateViewLayout(parentDockLayout, dockParams);
                 } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    if (event.getRawY() < metrics.heightPixels / 2) {
+                    if (event.getRawY() < heightPixels / 2) {
                         dockParams.x = (int)(initialWindowX + (event.getRawX() - initialTouchX));
                         dockParams.alpha = 1.0f;
                         closeWindowOnDrop = false;
                         wm.updateViewLayout(parentDockLayout, dockParams);
                     } else {
-                        dockParams.alpha = (metrics.heightPixels - event.getRawY()) / (metrics.heightPixels * (2.0f / 3.0f));
+                        dockParams.alpha = (heightPixels - event.getRawY()) / (heightPixels * (2.0f / 3.0f));
                         closeWindowOnDrop = true;
                         wm.updateViewLayout(parentDockLayout, dockParams);
                     }
@@ -235,7 +250,19 @@ public class DockService extends Service {
 
     public void addButtonColorFilter() {
         if (note != -1) {
-            button[note].getBackground().setColorFilter(0x88333333, PorterDuff.Mode.DARKEN);
+            button[note].getBackground().setColorFilter(new PorterDuffColorFilter(0x88333333, PorterDuff.Mode.DARKEN));
+        }
+    }
+
+    private int getScreenHeight() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
+            Rect bounds = windowMetrics.getBounds();
+            return bounds.height();
+        } else {
+            DisplayMetrics metrics = new DisplayMetrics();
+            wm.getDefaultDisplay().getMetrics(metrics);
+            return metrics.heightPixels;
         }
     }
 
