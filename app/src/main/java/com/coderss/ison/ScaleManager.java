@@ -10,6 +10,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -17,7 +18,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.DialogFragment;
 
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -77,6 +77,13 @@ public class ScaleManager extends AppCompatActivity {
                     systemBars.bottom + verticalMargin
             );
             return insets;
+        });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                cancelButton();
+            }
         });
 
         setTitle("Scale Manager");
@@ -394,14 +401,6 @@ public class ScaleManager extends AppCompatActivity {
         } else {
             goBackToIsonActivity();
         }
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            cancelButton();
-            return true;
-        } else return super.onKeyDown(keyCode, event);
     }
 
     protected void goBackToIsonActivity() {

@@ -5,9 +5,9 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -58,6 +58,15 @@ public class AppSettings extends AppCompatActivity {
             return insets;
         });
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(getApplicationContext(), IsonActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
         setTitle("Preferences");
         getSupportFragmentManager()
                 .beginTransaction()
@@ -66,13 +75,8 @@ public class AppSettings extends AppCompatActivity {
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Intent intent = new Intent(getApplicationContext(), IsonActivity.class);
-            startActivity(intent);
-            finish();
-            return true;
-        } else return super.onKeyDown(keyCode, event);
+    public void onStart() {
+        super.onStart();
     }
 
     public static class MySettingsFragment extends PreferenceFragmentCompat {
