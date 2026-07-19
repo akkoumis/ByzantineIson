@@ -78,16 +78,17 @@ This repository includes a workflow at `/home/runner/work/ByzantineIson/Byzantin
 * Push a tag matching `v*` (example: `v3.1`) to build and publish a release
 * Run manually from the Actions tab with `workflow_dispatch`
 
-### Required repository secrets
+### Optional repository secrets (for signing)
 
-Add the following GitHub repository secrets before using the workflow:
+Add the following GitHub repository secrets to build a signed release APK:
 
 * `ANDROID_KEYSTORE_BASE64`: base64-encoded keystore file content
 * `ANDROID_KEYSTORE_PASSWORD`: keystore password
 * `ANDROID_KEY_ALIAS`: key alias in the keystore
 * `ANDROID_KEY_PASSWORD`: password for the key alias
 
-The workflow decodes the keystore at runtime and uses these values to sign the `release` build.
+When these secrets are present, the workflow decodes the keystore at runtime and signs the `release` build.
+If any of the signing secrets are missing, the workflow still succeeds and produces an unsigned release APK instead.
 
 ### Versioning
 
