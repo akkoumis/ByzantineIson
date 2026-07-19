@@ -68,3 +68,28 @@ Future features:
 
 ### Thoughts moving forward
 I have successfully moved all of the sound processing down to the native layer to improve the audio delay. Settings now needs to be added with dark theme and audio and layout settings.
+
+## Automated APK releases with GitHub Actions
+
+This repository includes a workflow at `/home/runner/work/ByzantineIson/ByzantineIson/.github/workflows/release-apk.yml` that builds signed release APKs in CI.
+
+### Triggers
+
+* Push a tag matching `v*` (example: `v3.1`) to build and publish a release
+* Run manually from the Actions tab with `workflow_dispatch`
+
+### Required repository secrets
+
+Add the following GitHub repository secrets before using the workflow:
+
+* `ANDROID_KEYSTORE_BASE64`: base64-encoded keystore file content
+* `ANDROID_KEYSTORE_PASSWORD`: keystore password
+* `ANDROID_KEY_ALIAS`: key alias in the keystore
+* `ANDROID_KEY_PASSWORD`: password for the key alias
+
+The workflow decodes the keystore at runtime and uses these values to sign the `release` build.
+
+### Versioning
+
+* `versionCode` in `app/build.gradle` must always increase between Play Store uploads
+* On tag builds, CI sets `versionName` from the tag without the leading `v` (for example, tag `v3.1` -> version name `3.1`)
