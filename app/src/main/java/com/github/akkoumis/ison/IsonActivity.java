@@ -130,8 +130,8 @@ public class IsonActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        int horizontalMargin = (int) getResources().getDimension(R.dimen.activity_horizontal_margin);
-        int verticalMargin = (int) getResources().getDimension(R.dimen.activity_vertical_margin);
+        int horizontalMargin = getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
+        int verticalMargin = getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_root), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

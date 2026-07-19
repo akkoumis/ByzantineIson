@@ -44,8 +44,8 @@ public class AppSettings extends AppCompatActivity {
 
         setContentView(R.layout.app_settings);
 
-        int horizontalMargin = (int) getResources().getDimension(R.dimen.activity_horizontal_margin);
-        int verticalMargin = (int) getResources().getDimension(R.dimen.activity_vertical_margin);
+        int horizontalMargin = getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
+        int verticalMargin = getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.app_settings_root), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -72,11 +72,6 @@ public class AppSettings extends AppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.settings_container, new MySettingsFragment())
                 .commit();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
     }
 
     public static class MySettingsFragment extends PreferenceFragmentCompat {
